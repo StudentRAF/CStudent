@@ -1,0 +1,26 @@
+int main() {
+    print("Arithmetic Operators");
+
+    int number1 = 30;
+    int number2 = 31;
+
+    int numberAddition       = number1 + number2;
+    int numberSubtraction    = number1 - number2;
+    int numberMultiplication = number1 * number2;
+    int numberDivision       = number1 / number2;
+    int numberModulo         = number1 % number2;
+
+    double decimal1 = 30.0;
+    double decimal2 = 31.0;
+
+    double decimalAddition       = decimal1 + decimal2;
+    double decimalSubtraction    = decimal1 - decimal2;
+    double decimalMultiplication = decimal1 * decimal2;
+    double decimalDivision       = decimal1 / decimal2;
+    double decimalModulo         = decimal1 % decimal2;
+
+    string string1 = "First";
+    string string2 = "Second";
+
+    string concatenate = string1 + " " + string2;
+}

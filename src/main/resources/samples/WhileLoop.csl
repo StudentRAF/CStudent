@@ -1,0 +1,13 @@
+int main() {
+    print("While Loop");
+
+    int numberArray = [1, 2, 3, 4];
+
+    int size  = 4;
+    int index = 0;
+
+    while(index < size) {
+        print(numberArray[index]);
+        index = index + 1;
+    }
+}

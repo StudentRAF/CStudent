@@ -1,0 +1,9 @@
+int main() {
+    print("Basic Functions");
+
+    string text;
+
+    scan(text);
+
+    print("Input: " + text);
+}

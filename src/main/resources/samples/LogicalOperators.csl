@@ -1,0 +1,12 @@
+int main() {
+    print("Logical Operators");
+
+    bool condition1 = true;
+    bool condition2 = true;
+
+    bool logicalNOT     = !condition1;
+    bool logicalAND     =  condition1 &&  condition2;
+    bool logicalOR      =  condition1 ||  condition2;
+    bool logicalANDWord =  condition1 and condition2;
+    bool logicalORWord  =  condition1 or  condition2;
+}

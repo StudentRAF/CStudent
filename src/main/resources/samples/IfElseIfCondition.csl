@@ -1,0 +1,16 @@
+int main() {
+    print("If Elif Condition");
+
+    string input;
+    scan(input);
+
+    if (input == "true") {
+        print("True Condition");
+    }
+    elif (input == "false") {
+        print("False Condition");
+    }
+    else {
+        print("Unknown Condition");
+    }
+}

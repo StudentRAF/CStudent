@@ -1,0 +1,10 @@
+int main() {
+    print("Variables Declaration");
+
+    bool   condition;
+    int    number;
+    char   character;
+    double decimal;
+    string characterArray;
+    int    numberArray[];
+}

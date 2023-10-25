@@ -1,0 +1,23 @@
+int main() {
+    print("Relational Operators");
+
+    int    number1;
+    int    number2;
+
+    bool numberEqual          = number1 == number2;
+    bool numberNotEqual       = number1 != number2;
+    bool numberGreater        = number1 >  number2;
+    bool numberSmaller        = number1 <  number2;
+    bool numberGreaterOrEqual = number1 >= number2;
+    bool numberSmallerOrEqual = number1 <= number2;
+
+    double decimal1;
+    double decimal2;
+
+    bool decimalEqual          = decimal1 == decimal2;
+    bool decimalNotEqual       = decimal1 != decimal2;
+    bool decimalGreater        = decimal1 >  decimal2;
+    bool decimalSmaller        = decimal1 <  decimal2;
+    bool decimalGreaterOrEqual = decimal1 >= decimal2;
+    bool decimalSmallerOrEqual = decimal1 <= decimal2;
+}

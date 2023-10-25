@@ -1,0 +1,10 @@
+int main() {
+    print("If Condition");
+
+    string input;
+    scan(input);
+
+    if (input == "true") {
+        print("True Condition");
+    }
+}

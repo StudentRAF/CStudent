@@ -1,0 +1,9 @@
+int main() {
+    print("For Loop");
+
+    int numberArray[] = [1, 2, 3, 4];
+
+    for(int number in numberArray) {
+        print(number);
+    }
+}

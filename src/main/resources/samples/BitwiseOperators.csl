@@ -1,0 +1,11 @@
+int main() {
+    print("Bitwise Operators");
+
+    int number = 20;
+
+    int numberBitshiftLeft   = number << 2;
+    int numberBitshiftRight  = number >> 2;
+    int numberBitwiseAND     = number &  2;
+    int numberBitwiseOR      = number |  2;
+    int numberBitwiseXOR     = number ^  2;
+}

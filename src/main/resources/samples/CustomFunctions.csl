@@ -1,0 +1,13 @@
+string getString(string parameter) {
+    return parameter;
+}
+
+string getCSL() {
+    return "csl";
+}
+
+int main() {
+    print("Custom Functions");
+
+    print(getCSL + " " + getString("test"));
+}

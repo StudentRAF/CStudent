@@ -1,0 +1,17 @@
+int main() {
+    print("Assignment Operator");
+
+    bool   condition;
+    int    number;
+    char   character;
+    double decimal;
+    string characterArray;
+    int    numberArray[];
+
+    condition      = true;
+    number         = 5;
+    character      = 'A';
+    decimal        = 5.5;
+    characterArray = "string value";
+    numberArray    = [1, 2, 3, 4, 5];
+}
