@@ -14,6 +14,7 @@ public enum CSLKeyword {
     FALSE ("false" ),
     FOR   ("for"   ),
     IF    ("if"    ),
+    IN    ("in"    ),
     INT   ("int"   ),
     OR    ("or"    ),
     STRING("string"),
@@ -21,7 +22,7 @@ public enum CSLKeyword {
     RETURN("return"),
     WHILE ("while" );
 
-    private static final HashMap<String, CSLKeyword> s_KeywordMap = init();
+    private static final HashMap<String, CSLKeyword> s_Map = init();
 
     private final String m_Identifier;
 
@@ -39,7 +40,15 @@ public enum CSLKeyword {
     }
 
     public static CSLKeyword get(String identifier) {
-        return s_KeywordMap.get(identifier);
+        return s_Map.get(identifier);
+    }
+
+    public static boolean has(String identifier) {
+        return get(identifier) != null;
+    }
+
+    public String getIdentifier() {
+        return m_Identifier;
     }
 
 }

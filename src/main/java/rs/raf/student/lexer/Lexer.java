@@ -1,12 +1,13 @@
 package rs.raf.student.lexer;
 
-import rs.raf.student.lexer.data.CSLCharacter;
+import rs.raf.student.lexer.data.CSLCharacterSet;
 import rs.raf.student.lexer.data.CSLKeyword;
-import rs.raf.student.lexer.data.CSLPunctuation;
+import rs.raf.student.lexer.data.CSLMultiCharacterSet;
 import rs.raf.student.lexer.data.CSLType;
-import rs.raf.student.lexer.exception.InvalidCharacterException;
+import rs.raf.student.lexer.exception.InvalidWordException;
 import rs.raf.student.lexer.exception.NotSupportedCharacterException;
 import rs.raf.student.lexer.exception.SampleNotLoadedException;
+import rs.raf.student.lexer.exception.UnreachableCodeException;
 import rs.raf.student.lexer.model.Word;
 import rs.raf.student.util.FileUtils;
 
@@ -31,166 +32,182 @@ public class Lexer {
             this::handleDigitCharacter,
             this::handleLetterCharacter,
             this::handleUnderscoreCharacter,
-            this::handlePunctuationCharacter,
+            this::handleSpecialCharacter,
             this::handleSeparatorCharacter,
-            this::handleAppend
+            this::handleStringCharacter
     );
 
-    private final StringBuilder word = new StringBuilder();
+    private final StringBuilder wordBuffer = new StringBuilder();
 
     private boolean isIdentifier  = false;
     private boolean isNumber      = false;
     private boolean isCharacter   = false;
     private boolean isString      = false;
-    private boolean isPunctuation = false;
+    private boolean isSpecial     = false;
 
     private void lex() {
         System.out.println(source);
+        CSLCharacterSet characterSet;
 
-        for (char character : source.toCharArray())
-            handlers.get(getCharacterTypeIndex(character)).handle(character);
+        for (char character : source.toCharArray()) {
+            characterSet = CSLCharacterSet.get(character);
+
+            handlers.get(getCharacterTypeIndex(characterSet, character)).handle(characterSet);
+        }
     }
 
-    private int getCharacterTypeIndex(char character) {
-        if (Character.isDigit(character))
-            return 0;
-
-        if (Character.isLetter(character))
-            return 1;
-
-        if (character == '_')
-            return 2;
-
-        if (CSLPunctuation.get(character) != null)
-            return 3;
-
-        if (Character.isWhitespace(character) || character == ';')
-            return 4;
-
-        if (isString)
+    private int getCharacterTypeIndex(CSLCharacterSet characterSet, char character) {
+        if (isString || isCharacter)
             return 5;
 
-        throw new NotSupportedCharacterException(character);
+        if (characterSet == null)
+            throw new NotSupportedCharacterException(character);
+
+        if (characterSet.isDigit())
+            return 0;
+
+        if (characterSet.isLetter())
+            return 1;
+
+        if (characterSet.isUnderscore())
+            return 2;
+
+        if (characterSet.isSpecial())
+            return 3;
+
+        if (characterSet.isSeparator())
+            return 4;
+
+        throw new UnreachableCodeException();
     }
 
     @FunctionalInterface
     private interface IHandler {
-        void handle(char character);
+        void handle(CSLCharacterSet character);
     }
 
-    private void handleDigitCharacter(char character) {
-        if (isPunctuation)
-            concludePunctuation();
+    private void handleDigitCharacter(CSLCharacterSet characterSet) {
+        if (isSpecial)
+            concludeSpecial();
 
         if (!isIdentifier)
             isNumber = true;
 
-        word.append(character);
+        wordBuffer.append(characterSet.getValue());
     }
 
-    private void handleLetterCharacter(char character) {
+    private void handleLetterCharacter(CSLCharacterSet characterSet) {
         if (isNumber)
-            throw new InvalidCharacterException();
-        else if (isPunctuation)
-            concludePunctuation();
+            throw new InvalidWordException(wordBuffer.append(characterSet.getValue()).toString());
+        else if (isSpecial)
+            concludeSpecial();
 
-        if (!isCharacter && !isString)
-            isIdentifier = true;
+        isIdentifier = true;
 
-        word.append(character);
+        wordBuffer.append(characterSet.getValue());
     }
 
-    private void handleUnderscoreCharacter(char character) {
+    private void handleUnderscoreCharacter(CSLCharacterSet characterSet) {
         if (isNumber)
-            throw new InvalidCharacterException();
-        else if (isPunctuation)
-            concludePunctuation();
+            throw new InvalidWordException(wordBuffer.append(characterSet.getValue()).toString());
+        else if (isSpecial)
+            concludeSpecial();
 
-        if (!isCharacter && !isString)
-            isIdentifier = true;
+        isIdentifier = true;
 
-        word.append(character);
+        wordBuffer.append(characterSet.getValue());
     }
 
-    private void handlePunctuationCharacter(char character) {
+    private void handleSpecialCharacter(CSLCharacterSet characterSet) {
         if (isNumber)
             concludeNumber();
         else if (isIdentifier)
             concludeIdentifier();
 
-        if (isCharacter && CSLCharacter.CHARACTER.matches(character))
+        wordBuffer.append(characterSet.getValue());
+
+        isSpecial = true;
+
+        if (characterSet.isStandalone())
+            concludeSpecial();
+    }
+
+    private void handleSeparatorCharacter(CSLCharacterSet characterSet) {
+        if (isNumber)
+            concludeNumber();
+        else if (isIdentifier)
+            concludeIdentifier();
+        else if (isSpecial)
+            concludeSpecial();
+    }
+
+    private void handleStringCharacter(CSLCharacterSet characterSet) {
+        if (isCharacter && characterSet.equals(CSLCharacterSet.SINGLE_QUOTE)) {
             concludeCharacter();
-        else if (isString && CSLCharacter.STRING.matches(character))
+            handleSpecialCharacter(CSLCharacterSet.SINGLE_QUOTE);
+        }
+        else if (isString && characterSet.equals(CSLCharacterSet.DOUBLE_QUOTE)) {
             concludeString();
-
-        word.append(character);
-
-        if ((isCharacter || isString) && CSLCharacter.get(character) == null)
-            return;
-
-        isPunctuation = true;
-
-        if (CSLPunctuation.get(character).isStandalone())
-            concludePunctuation();
-    }
-
-    private void handleSeparatorCharacter(char character) {
-        if (isNumber)
-            concludeNumber();
-        else if (isIdentifier)
-            concludeIdentifier();
-        else if (isPunctuation)
-            concludePunctuation();
-
-        if (Character.isSpaceChar(character) && (isCharacter || isString))
-            word.append(character);
-    }
-
-    private void handleAppend(char character) {
-        word.append(character);
+            handleSpecialCharacter(CSLCharacterSet.DOUBLE_QUOTE);
+        }
+        else
+            wordBuffer.append(characterSet.getValue());
     }
 
     private void concludeNumber() {
-        m_Words.add(new Word(word.toString(), CSLType.NUMBER));
+        m_Words.add(new Word(wordBuffer.toString(), CSLType.NUMBER));
 
-        word.setLength(0);
+        wordBuffer.setLength(0);
         isNumber = false;
     }
 
     private void concludeIdentifier() {
-        if (CSLKeyword.get(word.toString()) != null)
-            m_Words.add(new Word(word.toString(), CSLType.KEYWORD));
-        else
-            m_Words.add(new Word(word.toString(), CSLType.IDENTIFIER));
+        String word = wordBuffer.toString();
 
-        word.setLength(0);
+        if (CSLKeyword.has(word))
+            m_Words.add(new Word(word, CSLType.KEYWORD));
+        else
+            m_Words.add(new Word(word, CSLType.IDENTIFIER));
+
+        wordBuffer.setLength(0);
         isIdentifier = false;
     }
 
-    private void concludePunctuation() {
-        m_Words.add(new Word(word.toString(),  CSLType.PUNCTUATION));
+    private void concludeSpecial() {
+        String word = wordBuffer.toString();
 
-        if (CSLCharacter.CHARACTER.matches(word.toString()))
-            isCharacter = !isCharacter;
-        else if (CSLCharacter.STRING.matches(word.toString()))
-            isString = !isString;
+        CSLCharacterSet      characterSet      = CSLCharacterSet.get(word);
+        CSLMultiCharacterSet multiCharacterSet = CSLMultiCharacterSet.get(word);
 
-        word.setLength(0);
-        isPunctuation = false;
+        if (characterSet == null && multiCharacterSet == null)
+            throw new InvalidWordException(word);
+
+        if (characterSet != null) {
+            if (characterSet.isPrintable())
+                m_Words.add(new Word(word, characterSet.getDescription(), CSLType.SPECIAL));
+
+            if (characterSet.equals(CSLCharacterSet.SINGLE_QUOTE))
+                isCharacter = !isCharacter;
+            else if (characterSet.equals(CSLCharacterSet.DOUBLE_QUOTE))
+                isString = !isString;
+        }
+        else if (multiCharacterSet.isPrintable())
+            m_Words.add(new Word(word, multiCharacterSet.getDescription(), CSLType.SPECIAL));
+
+        wordBuffer.setLength(0);
+        isSpecial = false;
     }
 
     private void concludeCharacter() {
-        m_Words.add(new Word(word.toString(), CSLType.CHARACTER));
+        m_Words.add(new Word(wordBuffer.toString(), CSLType.CHARACTER));
 
-        //isCharacter = false;
-        word.setLength(0);
+        wordBuffer.setLength(0);
     }
 
     private void concludeString() {
-        m_Words.add(new Word(word.toString(), CSLType.STRING));
+        m_Words.add(new Word(wordBuffer.toString(), CSLType.STRING));
 
-        //isString = false;
-        word.setLength(0);
+        wordBuffer.setLength(0);
     }
 
     public List<Word> words() {

@@ -2,12 +2,12 @@ package rs.raf.student.lexer.data;
 
 public enum CSLType {
 
-    KEYWORD    ("keyword"    ),
-    IDENTIFIER ("identifier" ),
-    NUMBER     ("number"     ),
-    PUNCTUATION("punctuation"),
-    STRING     ("string"     ),
-    CHARACTER  ("character"  );
+    KEYWORD   ("keyword"       ),
+    IDENTIFIER("identifier"    ),
+    NUMBER    ("number"        ),
+    SPECIAL   ("special symbol"),
+    STRING    ("string"        ),
+    CHARACTER ("character"     );
 
     private final String m_Name;
 
